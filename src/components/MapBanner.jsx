@@ -1,4 +1,4 @@
-import { images } from "../data/mockData"
+import { images } from "../data/assets"
 
 export default function MapBanner() {
   return (

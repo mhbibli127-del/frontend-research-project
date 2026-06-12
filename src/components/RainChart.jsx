@@ -1,6 +1,27 @@
-import { rainChartData } from "../data/mockData"
+const defaultChartData = [
+  { time: "10AM", value: 0 },
+  { time: "11AM", value: 0 },
+  { time: "12PM", value: 0 },
+  { time: "01PM", value: 0 },
+  { time: "02PM", value: 0 },
+  { time: "03PM", value: 0 },
+]
 
-export default function RainChart({ data = rainChartData }) {
+export default function RainChart({ data, loading }) {
+  const chartData = data?.length ? data : defaultChartData
+
+  if (loading && !data?.length) {
+    return (
+      <section
+        className="flex h-[228px] w-full items-center justify-center rounded-[24px] bg-card p-4 text-[14px] text-muted sm:rounded-[32px] sm:p-[16px]"
+        aria-busy="true"
+        aria-label="Loading chance of rain chart"
+      >
+        Loading...
+      </section>
+    )
+  }
+
   const max = 100
   const width = 236
   const height = 168
@@ -8,8 +29,8 @@ export default function RainChart({ data = rainChartData }) {
   const chartW = width - padding.left - padding.right
   const chartH = height - padding.top - padding.bottom
 
-  const points = data.map((item, i) => {
-    const x = padding.left + (i / (data.length - 1)) * chartW
+  const points = chartData.map((item, i) => {
+    const x = padding.left + (i / (chartData.length - 1)) * chartW
     const y = padding.top + chartH - (item.value / max) * chartH
     return { x, y, ...item }
   })

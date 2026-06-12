@@ -1,112 +1,122 @@
-import { Search, MapPin, LayoutGrid, Bell, Moon } from "lucide-react"
-import { images, location } from "../data/mockData"
 
-function SearchField({ className = "" }) {
+"use client";
+
+import { useState } from "react";
+import { Search, MapPin, LayoutGrid, Bell, Moon } from "lucide-react";
+import { images } from "../data/assets";
+
+function SearchField({ className = "", fetchWeather }) {
+  const [input, setInput] = useState("");
+
+  const handleSearch = () => {
+    if (!input) return;
+    fetchWeather(input);
+  };
+
   return (
     <label className={`relative block w-full ${className}`}>
       <span className="sr-only">Search city</span>
+
       <Search
-        className="pointer-events-none absolute left-[18px] top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-muted"
-        strokeWidth={1.75}
-        aria-hidden="true"
+        onClick={handleSearch}
+        className="cursor-pointer absolute left-[18px] top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-muted"
       />
+
       <input
         type="search"
         placeholder="Search City"
-        aria-label="Search city"
-        className="h-11 w-full rounded-full bg-card pl-[46px] pr-5 text-[14px] text-white outline-none placeholder:text-muted sm:h-[44px]"
+        className="h-11 w-full rounded-full bg-card pl-[46px] pr-5 text-[14px] text-white outline-none placeholder:text-muted"
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        onKeyDown={(e) => e.key === "Enter" && handleSearch()}
       />
     </label>
-  )
+  );
 }
 
 function NavActions() {
   return (
     <>
-      <button
-        type="button"
-        aria-label="Dashboard menu"
-        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-card text-white/90 sm:h-[44px] sm:w-[44px]"
-      >
-        <LayoutGrid className="h-[18px] w-[18px]" strokeWidth={1.75} />
+      <button className="flex h-10 w-10 items-center justify-center rounded-full bg-card">
+        <LayoutGrid className="h-[18px] w-[18px]" />
       </button>
 
-      <button
-        type="button"
-        aria-label="Notifications"
-        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-card text-white/90 sm:h-[44px] sm:w-[44px]"
-      >
-        <Bell className="h-[18px] w-[18px]" strokeWidth={1.75} />
+      <button className="flex h-10 w-10 items-center justify-center rounded-full bg-card">
+        <Bell className="h-[18px] w-[18px]" />
       </button>
     </>
-  )
+  );
 }
 
-function NavLocation() {
+function NavLocation({ weather }) {
+  const city = weather?.name ?? "Baku"
+  const country = weather?.sys?.country ?? ""
+
   return (
     <div className="ml-1 hidden items-center gap-2 lg:flex">
-      <MapPin className="h-[15px] w-[15px] text-muted" strokeWidth={1.75} aria-hidden="true" />
-      <p className="whitespace-nowrap text-[14px] font-medium text-white">
-        {location.city}, {location.country}
+      <MapPin className="h-[15px] w-[15px] text-muted" />
+      <p className="text-[14px] text-white">
+        {city}{country ? `, ${country}` : ""}
       </p>
     </div>
-  )
+  );
 }
 
 function NavRight() {
   return (
-    <div className="flex shrink-0 items-center gap-3 sm:gap-[14px]">
-      <div
-        className="relative h-7 w-[52px] rounded-full bg-card-soft"
-        role="switch"
-        aria-checked="true"
-        aria-label="Dark mode enabled"
-      >
+    <div className="flex items-center gap-3">
+      <div className="relative h-7 w-[52px] rounded-full bg-card-soft">
         <div className="absolute right-0.5 top-0.5 flex h-6 w-6 items-center justify-center rounded-full bg-accent">
-          <Moon className="h-3.5 w-3.5 text-white" strokeWidth={2} />
+          <Moon className="h-3.5 w-3.5 text-white" />
         </div>
       </div>
 
       <img
         src={images.avatar}
-        alt="User profile"
-        className="h-10 w-10 rounded-full object-cover sm:h-[44px] sm:w-[44px]"
+        alt="avatar"
+        className="h-10 w-10 rounded-full object-cover"
       />
     </div>
-  )
+  );
 }
 
-export default function Navbar() {
+export default function Navbar({ fetchWeather, weather }) {
+  const city = weather?.name ?? "Baku"
+  const country = weather?.sys?.country ?? ""
+
   return (
     <header className="flex flex-col gap-4">
-      {/* Desktop: search mx-auto = equal left/right margin; nav floats on sides */}
+
+      {/* Desktop */}
       <div className="relative hidden min-h-[44px] w-full md:block">
-        <div className="absolute left-0 top-1/2 z-10 flex -translate-y-1/2 items-center gap-[10px]">
+
+        <div className="absolute left-0 top-1/2 flex -translate-y-1/2 items-center gap-[10px]">
           <NavActions />
-          <NavLocation />
+          <NavLocation weather={weather} />
         </div>
 
-        <SearchField className="mx-auto w-full max-w-[480px]" />
+        <SearchField
+          className="mx-auto w-full max-w-[480px]"
+          fetchWeather={fetchWeather}
+        />
 
-        <div className="absolute right-0 top-1/2 z-10 -translate-y-1/2">
+        <div className="absolute right-0 top-1/2 -translate-y-1/2">
           <NavRight />
         </div>
       </div>
 
       {/* Mobile */}
-      <div className="flex min-h-11 items-center justify-between md:hidden">
-        <div className="flex items-center gap-[10px]">
-          <NavActions />
-        </div>
+      <div className="flex items-center justify-between md:hidden">
+        <NavActions />
         <NavRight />
       </div>
 
-      <SearchField className="md:hidden" />
+      <SearchField fetchWeather={fetchWeather} className="md:hidden" />
 
-      <p className="flex items-center gap-2 text-[14px] font-medium text-white lg:hidden">
-        <MapPin className="h-[15px] w-[15px] text-muted" strokeWidth={1.75} aria-hidden="true" />
-        {location.city}, {location.country}
+      <p className="flex items-center gap-2 text-[14px] text-white lg:hidden">
+        <MapPin className="h-[15px] w-[15px] text-muted" />
+        {city}{country ? `, ${country}` : ""}
       </p>
     </header>
-  )
+  );
 }

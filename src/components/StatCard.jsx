@@ -1,5 +1,5 @@
 import { Droplets, Eye } from "lucide-react"
-import { images } from "../data/mockData"
+import { images } from "../data/assets"
 
 function WindMiniChart() {
   const bars = [18, 32, 48, 62, 78, 92, 100, 92, 78, 62, 48, 32, 18, 42, 68, 88, 72, 52, 34, 20]
